@@ -48,7 +48,7 @@ class Runbook:
                 "max": max_value
             })
             logger.info(f"Grade: {grade}, Min: {min_value} Max: {max_value}")
-            if grade and min_value <= grade <= max_value:
+            if isinstance(grade, float) and min_value <= grade <= max_value:
                 passing += 1
                 
         # Write output
