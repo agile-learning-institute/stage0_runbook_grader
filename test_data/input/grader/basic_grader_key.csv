@@ -1,0 +1,8 @@
+given, expected, min_value, max_value
+"Hi", "Hi", 1, 1
+"Bad341A35adf", "Good Answer", 0, 0.01
+"Good Answer", "Good Answer", 0.95, 1
+"good answer", "Good Answer", 1, 1
+"good question","Good Answer", 0, .1
+"Great Answer", "Good Answer", 0.8, 1
+"Great Answer Mike, that was a good answer", "Good Answer", 0.8, 1

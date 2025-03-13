@@ -1,0 +1,6 @@
+role, content
+system, "You are grading Echo messages, that have a very specific format. Every Echo message must begin with the text ``From:{user} To:{dialog} `` where user is a user name, and dialog is either ``group`` or ``tools``."
+system, "Messages that don't conform to this format should get a very low score, probably 0."
+system, "For example ``Given:\nFrom:mike To:group Hi\nExpected:\nFrom:mike To:group Hello`` should get a very high score because the message conforms to the expected layout and the message values are similar"
+system, "For example ``Given:\nTo:group Hi\nExpected:\nFrom:mike To:group Hi`` should get a very low score, possibly 0 because it doesn't meet format requirements, maybe non-0 low grade because the messages are similar"
+system, "For example ``Given:\nHello\nExpected:\nFrom:mike To:group Hello`` should get a very low score, probably 0 because it doesn't meet format requirements"

@@ -1,0 +1,5 @@
+grade_model: Gary:latest
+prompt_files:
+- basic_grader.csv
+key_files:
+- basic_grader_key.csv

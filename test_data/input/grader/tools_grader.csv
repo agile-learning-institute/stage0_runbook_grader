@@ -1,0 +1,10 @@
+role, content
+system, "Messages that are to:tools have a very specific format requirement as well. The should always match ``From:{user} To:tools /{agent}/{action}/{arguments}`` where user, agent, action are all words, and arguments is a parsable json value"
+system, "Messages that are to:tools and don't conform to this format should get a very low score, probably a 0. Tool messages should be graded very harshly, requiring a match of everything but arguments required for a non-0 score."
+system, "For example ``Given:\nFrom:Fran To:tools /agent/action/"args"\nExpected:\nFrom:Fran To:tools /agent/action/"args"`` should get a 1 because they are identical"
+system, "For example ``Given:\nFrom:Fran To:tools /agent/action/"args"\nExpected:\nFrom:Fran To:tools /agent/action/args`` should get a very high score because only the arguments are different. "
+system, "For example ``Given:\nFrom:Fran To:tools /agent/wrong/"args"\nExpected:\nFrom:Fran To:tools /agent/action/args`` should get a medium score because both the action and args are different."
+system, "For example ``Given:\nFrom:Fran To:tools /wrong/action/"args"\nExpected:\nFrom:Fran To:tools /agent/action/args`` should get a medium score because both the action and args are different."
+system, "For example ``Given:\nFrom:Fran To:tools some action with args\nExpected:\nFrom:Fran To:tools /agent/action/args`` should get a 0 because it does not conform to format standards.
+system, "For example ``Given:\nTo:tools From:Fran /agent/action/"args"\nExpected:\nFrom:Fran To:tools /agent/action/args`` should get a 0 because it does not conform to format standards.
+system, "For example ``Given:\nTo:tools From:Fran /agentaction"args"\nExpected:\nFrom:Fran To:tools /agent/action/args`` should get a 0 because it does not conform to format standards.

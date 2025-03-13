@@ -1,0 +1,7 @@
+FROM llama3.2:latest
+
+# Set the temperature for maximum and coherence
+PARAMETER temperature 0
+
+# Set the context window size to 4096 tokens
+PARAMETER num_ctx 4096
