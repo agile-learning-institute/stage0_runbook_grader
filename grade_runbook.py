@@ -58,10 +58,10 @@ class Runbook:
         with open(file_path, "w", encoding="utf-8") as file:
             json.dump(outcomes, file, indent=4)  
 
-        print(f"Final Grade: {passing / len(outcomes)}")
+        logger.info(f"Final Grade: {passing / len(outcomes)} Saved To: {file_path}")
     
 def main():
-    config_folder = os.getenv("CONFIG_FOLDER", "/config") 
+    config_folder = os.getenv("CONFIG_FOLDER", "./config") 
     input_folder = os.getenv("INPUT_FOLDER", "./input")
     output_folder = os.getenv("OUTPUT_FOLDER", "./output")
     logging_level = os.getenv("LOG_LEVEL", logging.INFO)
