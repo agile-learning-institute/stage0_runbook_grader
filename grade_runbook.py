@@ -55,6 +55,7 @@ class Runbook:
         timestamp = datetime.now().strftime("%Y.%m.%dT%H:%M:%S")
         filename = f"{timestamp}-grades.json"
         file_path = os.path.join(self.output_folder, filename)
+        os.makedirs(self.output_folder, exist_ok=True)
         with open(file_path, "w", encoding="utf-8") as file:
             json.dump(outcomes, file, indent=4)  
 
