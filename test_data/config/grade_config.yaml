@@ -1,4 +1,4 @@
-grade_model: Gary:latest
+grade_model: deepseek-r1:70b
 prompt_files:
 - basic_grader.csv
 key_files:

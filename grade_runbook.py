@@ -1,11 +1,34 @@
+from datetime import datetime
+import os
 import json
 import yaml
-import os
-from datetime import datetime
-from stage0_py_utils import Evaluator, Loader
-
 import logging
+
+CONFIG_FOLDER = os.getenv("CONFIG_FOLDER", "./config") 
+INPUT_FOLDER = os.getenv("INPUT_FOLDER", "./input")
+OUTPUT_FOLDER = os.getenv("OUTPUT_FOLDER", "./output")
+LOGGING_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+LOGGING_LEVEL = getattr(logging, LOGGING_LEVEL, logging.INFO)
+
+# Reset logging handlers
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+
+# Configure logging
+logging.basicConfig(
+    level=LOGGING_LEVEL,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+
 logger = logging.getLogger(__name__)
+
+# Suppress noisy http loggers
+logging.getLogger("httpcore").setLevel(logging.WARNING)  
+logging.getLogger("httpx").setLevel(logging.WARNING)  
+
+# Utils import
+from stage0_py_utils import Evaluator, Loader
 
 class Runbook:
     """
@@ -29,10 +52,11 @@ class Runbook:
             grade_prompt_files=self.config["prompt_files"],
             grade_prompt=self.grade_prompt
         )
+        logger.info(f"Evaluator model: {self.config["grade_model"]}, prompt files: {self.config["prompt_files"]}, key files: {self.config["key_files"]}")
         
     def run(self):
         """Process Grader Configuration"""
-        outcomes = []
+        outcomes = [{"model": self.config["grade_model"], "prompt_files": self.config["prompt_files"], "key_files": self.config["key_files"]}]
         passing = 0
         for line in self.grade_keys:
             given = line["given"]
@@ -62,28 +86,18 @@ class Runbook:
         logger.info(f"Final Grade: {passing / len(outcomes)} Saved To: {file_path}")
     
 def main():
-    config_folder = os.getenv("CONFIG_FOLDER", "./config") 
-    input_folder = os.getenv("INPUT_FOLDER", "./input")
-    output_folder = os.getenv("OUTPUT_FOLDER", "./output")
-    logging_level = os.getenv("LOG_LEVEL", logging.INFO)
-
-    # Configure root logger
-    logging.basicConfig(level=logging_level)
-
-    # Suppress excessive DEBUG logs from `httpcore`
-    logging.getLogger("httpcore").setLevel(logging_level)  
-    logging.getLogger("httpx").setLevel(logging.WARNING)  # suppress `httpx` logs
-    logging.getLogger("stage0_py_utils.evaluator").setLevel(logging_level)
-    
+    start = datetime.now()
     logger.info(f"============================ Grader Pipeline Starting ==============================")
-    logger.info(f"Initialized, Input: {input_folder}, Output: {output_folder}, Config: {config_folder} Logging Level {logging_level}")
+    logger.info(f"Initialized, Input: {INPUT_FOLDER}, Output: {OUTPUT_FOLDER}, Config: {CONFIG_FOLDER} Logging Level {LOGGING_LEVEL}")
     
     try:
-        runner = Runbook(config_folder=config_folder, input_folder=input_folder, output_folder=output_folder)
+        runner = Runbook(config_folder=CONFIG_FOLDER, input_folder=INPUT_FOLDER, output_folder=OUTPUT_FOLDER)
         runner.run()
     except Exception as e:
         logger.error(f"Error Reported {str(e)}", exc_info=True)
-    logger.info(f"===================== Grader Pipeline Completed Successfully =======================")
+        
+    end = datetime.now()
+    logger.info(f"============== Graded {len(runner.grade_keys)} keys, in {end-start}==================")
 
 if __name__ == "__main__":
     main()
