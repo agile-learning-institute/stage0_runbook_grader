@@ -56,38 +56,50 @@ class Runbook:
         
     def run(self):
         """Process Grader Configuration"""
-        outcomes = [{"model": self.config["grade_model"], "prompt_files": self.config["prompt_files"], "key_files": self.config["key_files"]}]
+        start = datetime.now()
+        logger.info(f"Starting {len(self.grade_keys)} tests at {str(start)}")
         passing = 0
+        outcomes = [{
+            "started_at": str(start),
+            "model": self.config["grade_model"], 
+            "prompt_files": self.config["prompt_files"], 
+            "key_files": self.config["key_files"]
+        }]
         for line in self.grade_keys:
             given = line["given"]
             expected = line["expected"]
             min_value = float(line["min_value"])
             max_value = float(line["max_value"])
+            before = datetime.now()
             grade = self.evaluator.grade_reply(expected=expected, given=given)
+            latency = str(datetime.now() - before)
             outcomes.append({
                 "given": given, 
                 "expected": expected, 
                 "grade": grade, 
                 "min": min_value, 
-                "max": max_value
+                "max": max_value,
+                "latency": latency
             })
-            logger.info(f"Grade: {grade}, Min: {min_value} Max: {max_value}")
-            if isinstance(grade, float) and min_value <= grade <= max_value:
+            is_passing_score = isinstance(grade, float) and min_value <= grade <= max_value
+            logger.info(f"Latency: {latency} Grade: {grade}, Min: {min_value} Max: {max_value} Pass: {is_passing_score}")
+            if is_passing_score:
                 passing += 1
                 
         # Write output
-        timestamp = datetime.now().strftime("%Y.%m.%dT%H:%M:%S")
+        end = datetime.now()
+        outcomes[0]["ended_at"] = str(end)
+        timestamp = end.strftime("%Y.%m.%dT%H:%M:%S")
         filename = f"{timestamp}-grades.json"
         file_path = os.path.join(self.output_folder, filename)
         os.makedirs(self.output_folder, exist_ok=True)
         with open(file_path, "w", encoding="utf-8") as file:
             json.dump(outcomes, file, indent=4)  
 
-        logger.info(f"Final Grade: {passing / len(outcomes)} Saved To: {file_path}")
+        logger.info(f"Final Grade: {round(passing / len(self.grade_keys) * 100)}% in {end-start} Saved To: {file_path}")
     
 def main():
-    start = datetime.now()
-    logger.info(f"============================ Grader Pipeline Starting ==============================")
+    logger.info("============================ Grader Pipeline Starting ==============================")
     logger.info(f"Initialized, Input: {INPUT_FOLDER}, Output: {OUTPUT_FOLDER}, Config: {CONFIG_FOLDER} Logging Level {LOGGING_LEVEL}")
     
     try:
@@ -96,8 +108,7 @@ def main():
     except Exception as e:
         logger.error(f"Error Reported {str(e)}", exc_info=True)
         
-    end = datetime.now()
-    logger.info(f"============== Graded {len(runner.grade_keys)} keys, in {end-start}==================")
+    logger.info("======================== Grader Pipeline Completed Successfully =====================")
 
 if __name__ == "__main__":
     main()

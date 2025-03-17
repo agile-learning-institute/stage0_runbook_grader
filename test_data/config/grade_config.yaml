@@ -1,4 +1,4 @@
-grade_model: deepseek-r1:70b
+grade_model: llama3.2:latest
 prompt_files:
 - basic_grader.csv
 key_files:
