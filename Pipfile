@@ -8,11 +8,11 @@ grade = "sh -c 'INPUT_FOLDER=./test_data/input OUTPUT_FOLDER=./test_data/output 
 debug = "sh -c 'INPUT_FOLDER=./test_data/input OUTPUT_FOLDER=./test_data/output CONFIG_FOLDER=./test_data/config LOG_LEVEL=DEBUG python3 -m grade_runbook'"
 model = "sh -c 'ollama create Gary:latest -f Gary.modelfile'"
 build = "docker build --tag ghcr.io/agile-learning-institute/stage0_runbook_grade:latest ."
-container = "sh -c 'docker run --rm -v ./test_data/input:/input -v ./test_data/config:/config -v ./test_data/output:/output ghcr.io/agile-learning-institute/stage0_runbook_grade:latest'"
+container = "sh -c 'docker run --rm -e OLLAMA_HOST=http://host.docker.internal:11434 -e CONFIG_FOLDER=/config -v ./test_data/input:/input -v ./test_data/config:/config -v ./test_data/output:/output ghcr.io/agile-learning-institute/stage0_runbook_grade:latest'"
 
 [packages]
 pyyaml = "*"
-stage0-py-utils = {file = "../stage0_py_utils/dist/stage0_py_utils-0.1.1-py3-none-any.whl"}
+stage0-py-utils = "*"
 
 [dev-packages]
 
